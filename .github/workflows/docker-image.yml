@@ -35,7 +35,8 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha
-          description: file=./README.md
+          labels: |
+            org.opencontainers.image.description=Alpine Linux based Docker image with qpdf and Ghostscript for PDF manipulation.
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
