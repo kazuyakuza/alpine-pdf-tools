@@ -2,6 +2,11 @@
 
 This repository contains the files to build a Docker image with Alpine Linux and the PDF tools qpdf and Ghostscript.
 
+## Links
+
+- **GitHub Repository:** <https://github.com/kazuyakuza/alpine-pdf-tools>
+- **Docker Hub Image:** <https://hub.docker.com/repository/docker/kazuyakuza/alpine-pdf-tools>
+
 ## About
 
 This Docker image provides a lightweight environment for working with PDF files. It includes:
