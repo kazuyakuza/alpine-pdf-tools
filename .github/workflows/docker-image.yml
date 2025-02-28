@@ -35,8 +35,6 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha
-          labels: |
-            org.opencontainers.image.description=Alpine Linux based Docker image with qpdf and Ghostscript for PDF manipulation.
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -45,3 +43,11 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Update Docker Hub Image Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          repository: kazuyakuza/alpine-pdf-tools
+          short-description: ${{ github.event.repository.description }}
