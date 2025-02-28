@@ -29,3 +29,4 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-pdf-tools:latest
+          description: ./README.md
