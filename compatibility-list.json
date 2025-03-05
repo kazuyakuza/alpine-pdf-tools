@@ -1,19 +1,24 @@
 {
+  "comment": "Each combination specifies versions of Node.js, qpdf, and Ghostscript to be included in the Docker image. 'latest' can be used to specify the latest available version. The 'version' field is used for the base image tag.",
+  "version": "1.0",
   "combinations": [
     {
-      "nodejs": "20.3.1",
+      "nodejs": "20",
       "qpdf": "11.10.1",
-      "ghostscript": "10.04.0"
+      "ghostscript": "10.04.0",
+      "tag": "1.0-node20-qpdf11.10.1-gs10.04.0"
     },
     {
-      "nodejs": "22",
+      "nodejs": "21",
       "qpdf": "11.10.1",
-      "ghostscript": "10.04.0"
+      "ghostscript": "10.04.0",
+      "tag": "1.0-node21-qpdf11.10.1-gs10.04.0"
     },
     {
       "nodejs": "latest",
       "qpdf": "latest",
-      "ghostscript": "latest"
+      "ghostscript": "latest",
+      "tag": "latest-combined"
     }
   ]
 }

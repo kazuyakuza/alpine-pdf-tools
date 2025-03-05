@@ -50,12 +50,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-pdf-tools
-          flavor: |
-            latest=true
           tags: |
-            type=semver,pattern={{version}}-node{{matrix.combination.nodejs}}-qpdf{{matrix.combination.qpdf}}-gs{{matrix.combination.ghostscript}}
-            type=semver,pattern={{major}}.{{minor}}-node{{matrix.combination.nodejs}}-qpdf{{matrix.combination.qpdf}}-gs{{matrix.combination.ghostscript}}
-            type=sha
+            ${{ matrix.combination.tag }}
+            ${{ (matrix.combination.tag == 'latest-combined' && 'latest') || '' }}
+            type=sha,prefix=${{ fromJson(needs.read-compatibility.outputs.matrix).version }}-
           labels: |
             org.opencontainers.image.description=Alpine Linux based Docker image with qpdf and Ghostscript for PDF manipulation. Supports multiple Node.js versions.
 
