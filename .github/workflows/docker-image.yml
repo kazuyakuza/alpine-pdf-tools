@@ -7,12 +7,11 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  read-compatibility:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
-    strategy:
-      matrix:
-        combination: ${{ fromJson(steps.read_compatibility.outputs.json).combinations }}
+    outputs:
+      matrix: ${{ steps.read_compatibility.outputs.json }}  # Pass to next job
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,6 +24,17 @@ jobs:
             const fs = require('fs');
             const compatibilityList = JSON.parse(fs.readFileSync('./compatibility-list.json', 'utf8'));
             core.setOutput('json', JSON.stringify(compatibilityList));
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    needs: read-compatibility  # Wait for previous job
+    strategy:
+      matrix:
+        combination: ${{ fromJson(needs.read-compatibility.outputs.matrix).combinations }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -52,6 +62,23 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
+      - name: Generate build arguments
+        id: build_args
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let args = [];
+            if ('${{ matrix.combination.nodejs }}' !== 'latest') {
+              args.push(`--build-arg NODE_VERSION=${{ matrix.combination.nodejs }}`);
+            }
+            if ('${{ matrix.combination.qpdf }}' !== 'latest') {
+              args.push(`--build-arg QPDF_VERSION=${{ matrix.combination.qpdf }}`);
+            }
+            if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
+              args.push(`--build-arg GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
+            }
+            core.setOutput('args', args.join(' '));
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -60,23 +87,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: ${{ steps.build_args.outputs.args }}
-
-      - name: Generate build arguments
-        id: build_args
-        uses: actions/github-script@v6
-        with:
-          script: |
-            let args = [];
-            if ('${{ matrix.combination.nodejs }}' !== 'latest') {
-              args.push(`NODE_VERSION=${{ matrix.combination.nodejs }}`);
-            }
-            if ('${{ matrix.combination.qpdf }}' !== 'latest') {
-              args.push(`QPDF_VERSION=${{ matrix.combination.qpdf }}`);
-            }
-            if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
-              args.push(`GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
-            }
-            core.setOutput('args', args.join('\\n'));
 
       - name: Update Docker Hub Image Description
         uses: peter-evans/dockerhub-description@v4
