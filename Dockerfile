@@ -1,10 +1,13 @@
-ARG NODE_VERSION=22
-ARG QPDF_VERSION=11.10.1
-ARG GHOSTSCRIPT_VERSION=10.04.0
+ARG QPDF_VERSION
+ARG GHOSTSCRIPT_VERSION
+ARG NODE_VERSION
 
 FROM alpine:latest
 
-RUN apk add --no-cache qpdf=${QPDF_VERSION} ghostscript=${GHOSTSCRIPT_VERSION} nodejs=${NODE_VERSION}
+RUN apk add --no-cache \
+    qpdf${QPDF_VERSION:+=$QPDF_VERSION} \
+    ghostscript${GHOSTSCRIPT_VERSION:+=$GHOSTSCRIPT_VERSION} \
+    nodejs${NODE_VERSION:+=$NODE_VERSION}
 
 CMD ["gs", "--version"]
 CMD ["qpdf", "--version"]

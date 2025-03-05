@@ -1,9 +1,9 @@
 {
   "combinations": [
     {
-      "nodejs": "21",
+      "nodejs": "22",
       "qpdf": "11.10.1",
-      "ghostscript": "10.3.0"
+      "ghostscript": "10.04.0"
     },
     {
       "nodejs": "latest",
