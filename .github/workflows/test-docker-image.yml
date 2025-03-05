@@ -6,9 +6,39 @@ on:
 jobs:
   test-build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        combination: ${{ fromJson(steps.read_compatibility.outputs.json).combinations }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Read compatibility list
+        id: read_compatibility
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const compatibilityList = JSON.parse(fs.readFileSync('./compatibility-list.json', 'utf8'));
+            core.setOutput('json', JSON.stringify(compatibilityList));
+
+      - name: Generate build arguments
+        id: build_args
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let args = [];
+            if ('${{ matrix.combination.nodejs }}' !== 'latest') {
+              args.push(`NODE_VERSION=${{ matrix.combination.nodejs }}`);
+            }
+            if ('${{ matrix.combination.qpdf }}' !== 'latest') {
+              args.push(`QPDF_VERSION=${{ matrix.combination.qpdf }}`);
+            }
+            if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
+              args.push(`GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
+            }
+            core.setOutput('args', args.join('\\n'));
+
       - name: Build Docker image
-        run: docker build -t alpine-pdf-tools .
+        run: |
+          docker build ${{ steps.build_args.outputs.args }} -t alpine-pdf-tools:test .

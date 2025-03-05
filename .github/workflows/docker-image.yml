@@ -19,6 +19,28 @@ jobs:
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
+    strategy:
+      matrix:
+        combination: ${{ fromJson(steps.read_compatibility.outputs.json).combinations }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Read compatibility list
+        id: read_compatibility
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const compatibilityList = JSON.parse(fs.readFileSync('./compatibility-list.json', 'utf8'));
+            core.setOutput('json', JSON.stringify(compatibilityList));
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -31,10 +53,14 @@ jobs:
           flavor: |
             latest=true
           tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{version}}-node{{matrix.combination.nodejs}}-qpdf{{matrix.combination.qpdf}}-gs{{matrix.combination.ghostscript}}
+            type=semver,pattern={{major}}.{{minor}}-node{{matrix.combination.nodejs}}-qpdf{{matrix.combination.qpdf}}-gs{{matrix.combination.ghostscript}}
             type=sha
+          labels: |
+            org.opencontainers.image.description=Alpine Linux based Docker image with qpdf and Ghostscript for PDF manipulation. Supports multiple Node.js versions.
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -43,11 +69,29 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: ${{ steps.build_args.outputs.args }}
+
+      - name: Generate build arguments
+        id: build_args
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let args = [];
+            if ('${{ matrix.combination.nodejs }}' !== 'latest') {
+              args.push(`NODE_VERSION=${{ matrix.combination.nodejs }}`);
+            }
+            if ('${{ matrix.combination.qpdf }}' !== 'latest') {
+              args.push(`QPDF_VERSION=${{ matrix.combination.qpdf }}`);
+            }
+            if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
+              args.push(`GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
+            }
+            core.setOutput('args', args.join('\\n'));
 
       - name: Update Docker Hub Image Description
         uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          repository: kazuyakuza/alpine-pdf-tools
+          repository: ${{ secrets.DOCKERHUB_USERNAME }}/alpine-pdf-tools
           short-description: ${{ github.event.repository.description }}
