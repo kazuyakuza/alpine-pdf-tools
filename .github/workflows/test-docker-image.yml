@@ -38,15 +38,15 @@ jobs:
           script: |
             let args = [];
             if ('${{ matrix.combination.nodejs }}' !== 'latest') {
-              args.push(`NODE_VERSION=${{ matrix.combination.nodejs }}`);
+              args.push(`--build-arg NODE_VERSION=${{ matrix.combination.nodejs }}`);
             }
             if ('${{ matrix.combination.qpdf }}' !== 'latest') {
-              args.push(`QPDF_VERSION=${{ matrix.combination.qpdf }}`);
+              args.push(`--build-arg QPDF_VERSION=${{ matrix.combination.qpdf }}`);
             }
             if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
-              args.push(`GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
+              args.push(`--build-arg GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
             }
-            core.setOutput('args', args.join('\\n'));
+            core.setOutput('args', args.join(' '));  # Space-separated list, not \n
 
       - name: Build Docker image
         run: |
