@@ -46,7 +46,7 @@ jobs:
             if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
               args.push(`--build-arg GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
             }
-            core.setOutput('args', args.join(' '));  # Space-separated list, not \n
+            core.setOutput('args', args.join(' '));
 
       - name: Build Docker image
         run: |

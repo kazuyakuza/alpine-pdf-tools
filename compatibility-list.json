@@ -1,25 +1,9 @@
 {
   "combinations": [
     {
-      "nodejs": "18",
-      "qpdf": "11.10.1",
-      "ghostscript": "10.0.0"
-    },
-    {
-      "nodejs": "20",
-      "qpdf": "11.10.1",
-      "ghostscript": "10.0.0"
-    },
-    {
       "nodejs": "21",
       "qpdf": "11.10.1",
-      "ghostscript": "10.0.0"
-    },
-    {
-      "nodejs": "21",
-      "qpdf": "11.10.1",
-      "ghostscript": "10.3.0",
-      "comment": "While you could try to use 'latest', it's not recommended for reproducibility. Alpine Linux packages are versioned, so 'latest' won't work directly with apk. It's better to specify concrete versions."
+      "ghostscript": "10.3.0"
     },
     {
       "nodejs": "latest",
