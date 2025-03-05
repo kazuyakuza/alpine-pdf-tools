@@ -66,9 +66,9 @@ jobs:
             const expectedQpdfVersion = '${{ matrix.combination.qpdf }}' === 'latest' ? 'latest' : '${{ matrix.combination.qpdf }}';
             const expectedGsVersion = '${{ matrix.combination.ghostscript }}' === 'latest' ? 'latest' : '${{ matrix.combination.ghostscript }}';
 
-            const nodeVersionMatch = output.match(/v(\d+\.\d+|\d+)/);
+            const nodeVersionMatch = output.match(/v(\d+\.\d+\.\d+|\d+\.\d+|\d+)/);
             const qpdfVersionMatch = output.match(/qpdf version (\d+\.\d+\.\d+)/);
-            const gsVersionMatch = output.match(/(\d+\.\d+)/);
+            const gsVersionMatch = output.match(/(\d+\.\d+\.\d+|\d+\.\d+|\d+)/);
 
             const actualNodeVersion = nodeVersionMatch ? nodeVersionMatch[1] : null;
             const actualQpdfVersion = qpdfVersionMatch ? qpdfVersionMatch[1] : null;
