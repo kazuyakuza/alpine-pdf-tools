@@ -9,6 +9,4 @@ RUN apk add --no-cache \
     ghostscript${GHOSTSCRIPT_VERSION:+=$GHOSTSCRIPT_VERSION} \
     nodejs${NODE_VERSION:+=$NODE_VERSION}
 
-CMD ["gs", "--version"]
-CMD ["qpdf", "--version"]
-CMD ["node", "--version"]
+CMD ["sh", "-c", "node --version && qpdf --version && gs --version"]
