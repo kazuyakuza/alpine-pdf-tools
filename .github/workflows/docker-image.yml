@@ -75,7 +75,9 @@ jobs:
             if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
               args.push(`--build-arg GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
             }
+            console.log(args.join(' '));
             core.setOutput('args', args.join(' '));
+            console.log('Arguments set end');
 
       - name: Debug build arguments
         run: echo "Build arguments: ${{ steps.build_args.outputs.args }}"
