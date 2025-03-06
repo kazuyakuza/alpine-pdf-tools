@@ -78,12 +78,6 @@ jobs:
             args = args.filter(arg => arg.trim()).join('\n').trim();
             core.setOutput('args', args);
 
-      - name: Debug build arguments
-        run: echo "Build arguments ${{ steps.build_args.outputs.args }}"
-
-      - name: Debug target argument
-        run: echo "target argument ${{ steps.build_args.outputs.target }}"
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
