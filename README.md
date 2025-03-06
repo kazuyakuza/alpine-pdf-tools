@@ -33,6 +33,33 @@ docker run -it alpine-pdf-tools
 
 This will start a container and drop you into a shell where you can use `qpdf` and `ghostscript`.
 
+## PDF Tools Example CMDs
+
+### QPDF
+
+```bash
+qpdf --linearize --remove-info --remove-metadata --flatten-annotations=all --optimize-images --empty --pages input.pdf -- output-qpdf.pdf
+```
+
+### Ghostscript
+
+```bash
+gs -q -dNOPAUSE -dBATCH -dSAFER \
+       -sDEVICE=pdfwrite \
+       -dCompatibilityLevel=1.7 \
+       -dColorImageDownsampleType=/Bicubic \
+       -dColorImageResolution=72 \
+       -dColorImageDownsampleThreshold=1.5 \
+       -dGrayImageDownsampleType=/Bicubic \
+       -dGrayImageResolution=72 \
+       -dGrayImageDownsampleThreshold=1.5 \
+       -dMonoImageDownsampleType=/Subsample \
+       -sOutputFile="output-gs.pdf" \
+       "input.pdf"
+```
+
+Note: read libs' official documentation for more info.
+
 ## Tags
 
 pdf, alpine, qpdf, ghostscript, docker, docker image
