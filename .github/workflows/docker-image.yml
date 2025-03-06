@@ -80,7 +80,7 @@ jobs:
             console.log('Arguments set end');
 
       - name: Debug build arguments
-        run: echo "Build arguments: ${{ steps.build_args.outputs.args }}"
+        run: echo "Build arguments ${{ steps.build_args.output.args }}"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
