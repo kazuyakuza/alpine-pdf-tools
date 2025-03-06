@@ -76,7 +76,7 @@ jobs:
               args.push(`GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
             }
             args = args.filter(arg => arg.trim());
-            core.setOutput('args', args);
+            core.setOutput('args', JSON.stringify(args));
 
       - name: Debug build arguments
         run: echo "Build arguments ${{ steps.build_args.outputs.args }}"
