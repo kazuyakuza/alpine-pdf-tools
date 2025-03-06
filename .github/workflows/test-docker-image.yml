@@ -80,19 +80,36 @@ jobs:
             const actualNodeVersion = nodeVersionMatch ? nodeVersionMatch[1] : null;
             const actualQpdfVersion = qpdfVersionMatch ? qpdfVersionMatch[1] : null;
             const actualGsVersion = gsVersionMatch ? gsVersionMatch[1] : null;
+            
+            const nodeVersionMatch = (
+              actualNodeVersion.match(expectedNodeVersion.replace('.','[.]'))
+              || expectedNodeVersion.match(actualNodeVersion.replace('.','[.]'))
+            );
+            
+            const qpdfVersionMatch = (
+              actualQpdfVersion.match(expectedQpdfVersion.replace('.','[.]'))
+              || expectedQpdfVersion.match(actualQpdfVersion.replace('.','[.]'))
+            );
+            
+            const ghostscriptVersionMatch = (
+              actualGsVersion.match(expectedGsVersion.replace('.','[.]'))
+              || expectedGsVersion.match(actualGsVersion.replace('.','[.]'))
+            );
 
-            if (expectedNodeVersion !== 'latest' && !actualNodeVersion.match(expectedNodeVersion.replace('.','[.]'))) {
+            if (expectedNodeVersion === 'latest') {
+              core.info(`Node.js version check skipped because 'latest' was specified.`);
+            } else if (!nodeVersionMatch) {
               core.setFailed(`Node.js version mismatch. Expected: ${expectedNodeVersion}, Actual: ${actualNodeVersion}`);
-            } else if (expectedNodeVersion === 'latest') {
-                core.info(`Node.js version check skipped because 'latest' was specified.`);
             }
-            if (expectedQpdfVersion !== 'latest' && !actualQpdfVersion.match(expectedQpdfVersion.replace('.','[.]'))) {
+            
+            if (expectedQpdfVersion === 'latest') {
+              core.info(`qpdf version check skipped because 'latest' was specified.`);
+            } else if (!qpdfVersionMatch) {
               core.setFailed(`qpdf version mismatch. Expected: ${expectedQpdfVersion}, Actual: ${actualQpdfVersion}`);
-            } else if (expectedQpdfVersion === 'latest') {
-                core.info(`qpdf version check skipped because 'latest' was specified.`);
             }
-            if (expectedGsVersion !== 'latest' && !actualGsVersion.match(expectedGsVersion.replace('.','[.]'))) {
+            
+            if (expectedGsVersion === 'latest'){
+              core.info(`Ghostscript version check skipped because 'latest' was specified.`);
+            } else if (!ghostscriptVersionMatch) {
               core.setFailed(`Ghostscript version mismatch. Expected: ${expectedGsVersion}, Actual: ${actualGsVersion}`);
-            } else if (expectedGsVersion === 'latest'){
-                core.info(`Ghostscript version check skipped because 'latest' was specified.`);
             }
