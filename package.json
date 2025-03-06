@@ -1,0 +1,19 @@
+{
+  "name": "alpine-pdf-tools",
+  "version": "1.0.0",
+  "description": "This repository contains the files to build a Docker image with Alpine Linux, the PDF tools qpdf and Ghostscript, and Node.js. The image can be built with different versions of Node.js and specific versions of qpdf and Ghostscript using build arguments.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kazuyakuza/alpine-pdf-tools.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kazuyakuza/alpine-pdf-tools/issues"
+  },
+  "homepage": "https://github.com/kazuyakuza/alpine-pdf-tools#readme",
+  "dependencies": {
+    "@actions/core": "^1.11.1"
+  }
+}

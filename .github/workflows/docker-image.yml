@@ -63,6 +63,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const core = require('@actions/core');
             let args = [];
             if ('${{ matrix.combination.nodejs }}' === 'latest') {
               args.push(`--target node-latest`);
@@ -75,8 +76,9 @@ jobs:
             if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
               args.push(`--build-arg GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
             }
-            console.log(args.join(' '));
-            core.setOutput('args', args.join(' '));
+            args = args.join(' ');
+            console.log({ args });
+            core.setOutput('args', args);
             console.log('Arguments set end');
 
       - name: Debug build arguments
