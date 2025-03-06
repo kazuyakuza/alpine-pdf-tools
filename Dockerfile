@@ -1,6 +1,16 @@
 ARG NODE_VERSION=latest
 ARG QPDF_VERSION=latest
 ARG GHOSTSCRIPT_VERSION=latest
+ARG NODE_IMAGE=node:alpine
+
+# Set NODE_IMAGE based on NODE_VERSION *before* any FROM instructions
+FROM scratch AS initial
+ARG NODE_VERSION=latest
+RUN if [ "$NODE_VERSION" = "latest" ]; then \
+      echo "NODE_IMAGE=node:alpine"; \
+    else \
+      echo "NODE_IMAGE=node:${NODE_VERSION}-alpine"; \
+    fi > /tmp/node_image.env
 
 # Builder stage for qpdf
 FROM alpine:latest AS builder
@@ -31,12 +41,7 @@ RUN if [ "$QPDF_VERSION" = "latest" ]; then \
     make install
 
 # Node.js base image
-ARG NODE_IMAGE=node:alpine
-
-RUN if [ "$NODE_VERSION" != "latest" ]; then \
-      NODE_IMAGE="node:${NODE_VERSION}-alpine"; \
-    fi
-
+ARG NODE_IMAGE
 FROM --platform=linux/amd64 ${NODE_IMAGE} as node-base
 
 # Final stage
