@@ -65,7 +65,7 @@ jobs:
           script: |
             let args = [];
             if ('${{ matrix.combination.nodejs }}' === 'latest') {
-              args.push(`--target node-latest`);
+              core.setOutput('target', 'node-latest');
             } else {
               args.push(`--build-arg NODE_VERSION=${{ matrix.combination.nodejs }}`);
             }
@@ -75,11 +75,8 @@ jobs:
             if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
               args.push(`--build-arg GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
             }
-            args = args.join(' ');
+            args = args.filter(arg => arg).join(' ');
             core.setOutput('args', args);
-
-      - name: Debug build arguments
-        run: echo "Build arguments ${{ steps.build_args.outputs.args }}"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -89,6 +86,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: ${{ steps.build_args.outputs.args }}
+          target: ${{ steps.build_args.outputs.target }}
 
       - name: Update Docker Hub Image Description
         uses: peter-evans/dockerhub-description@v4
