@@ -8,6 +8,7 @@ ARG GHOSTSCRIPT_VERSION=latest
 FROM alpine:latest AS qpdf-builder
 ARG QPDF_VERSION=latest
 ENV QPDF_VERSION=$QPDF_VERSION
+RUN echo "QPDF_VERSION=$QPDF_VERSION" >> /etc/environment;
 
 RUN apk add --no-cache \
     build-base \
@@ -27,7 +28,6 @@ RUN if [ "${QPDF_VERSION}" = "latest" ]; then \
       export QPDF_VERSION=${QPDF_VERSION#v}; \
       echo "QPDF_VERSION=$QPDF_VERSION" >> /etc/environment; \
     fi
-RUN source /etc/environment && echo "After: $QPDF_VERSION"
 RUN source /etc/environment && wget https://github.com/qpdf/qpdf/releases/download/v${QPDF_VERSION}/qpdf-${QPDF_VERSION}.tar.gz
 RUN source /etc/environment && tar -xf qpdf-${QPDF_VERSION}.tar.gz
 RUN source /etc/environment && \
