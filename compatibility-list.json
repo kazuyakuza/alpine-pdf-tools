@@ -5,13 +5,13 @@
     {
       "nodejs": "20.3.1",
       "qpdf": "11.10.1",
-      "ghostscript": "10.04.0",
+      "ghostscript": "10.04.0-r0",
       "tag": "node20.3.1-qpdf11.10.1-gs10.04.0"
     },
     {
       "nodejs": "22",
       "qpdf": "11.10.1",
-      "ghostscript": "10.04.0",
+      "ghostscript": "10.04.0-r0",
       "tag": "node22-qpdf11.10.1-gs10.04.0"
     },
     {

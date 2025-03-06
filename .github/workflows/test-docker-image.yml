@@ -37,7 +37,9 @@ jobs:
         with:
           script: |
             let args = [];
-            if ('${{ matrix.combination.nodejs }}' !== 'latest') {
+            if ('${{ matrix.combination.nodejs }}' === 'latest') {
+              args.push(`--target node-latest`);
+            } else {
               args.push(`--build-arg NODE_VERSION=${{ matrix.combination.nodejs }}`);
             }
             if ('${{ matrix.combination.qpdf }}' !== 'latest') {
@@ -51,3 +53,61 @@ jobs:
       - name: Build Docker image
         run: |
           docker build ${{ steps.build_args.outputs.args }} -t alpine-pdf-tools:test .
+
+      - name: Run Docker image and get versions
+        id: run_image
+        run: |
+          docker run alpine-pdf-tools:test | tee output.txt
+          echo "stdout<<EOF" >> $GITHUB_OUTPUT
+          cat output.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const output = `${{ steps.run_image.outputs.stdout }}`.trim();
+            console.log('Extracted output:', output);
+
+            const expectedNodeVersion = '${{ matrix.combination.nodejs }}' === 'latest' ? 'latest' : '${{ matrix.combination.nodejs }}';
+            const expectedQpdfVersion = '${{ matrix.combination.qpdf }}' === 'latest' ? 'latest' : '${{ matrix.combination.qpdf }}';
+            const expectedGsVersion = '${{ matrix.combination.ghostscript }}' === 'latest' ? 'latest' : '${{ matrix.combination.ghostscript }}';
+
+            const parseNodeVersion = output.match(/----node-version\nv([\d.]+)/);
+            const parseQpdfVersion = output.match(/----qpdf-version\nqpdf version ([\d.]+)/);
+            const parseGsVersion = output.match(/----ghostscript-version\n([\d.]+)/);
+
+            const actualNodeVersion = parseNodeVersion ? parseNodeVersion[1] : null;
+            const actualQpdfVersion = parseQpdfVersion ? parseQpdfVersion[1] : null;
+            const actualGsVersion = parseGsVersion ? parseGsVersion[1] : null;
+            
+            const nodeVersionMatch = (
+              actualNodeVersion.match(expectedNodeVersion.replace('.','[.]'))
+              || expectedNodeVersion.match(actualNodeVersion.replace('.','[.]'))
+            );
+            const qpdfVersionMatch = (
+              actualQpdfVersion.match(expectedQpdfVersion.replace('.','[.]'))
+              || expectedQpdfVersion.match(actualQpdfVersion.replace('.','[.]'))
+            );
+            const ghostscriptVersionMatch = (
+              actualGsVersion.match(expectedGsVersion.replace('.','[.]'))
+              || expectedGsVersion.match(actualGsVersion.replace('.','[.]'))
+            );
+
+            if (expectedNodeVersion === 'latest') {
+              core.info(`Node.js version check skipped because 'latest' was specified.`);
+            } else if (!nodeVersionMatch) {
+              core.setFailed(`Node.js version mismatch. Expected: ${expectedNodeVersion}, Actual: ${actualNodeVersion}`);
+            }
+            
+            if (expectedQpdfVersion === 'latest') {
+              core.info(`qpdf version check skipped because 'latest' was specified.`);
+            } else if (!qpdfVersionMatch) {
+              core.setFailed(`qpdf version mismatch. Expected: ${expectedQpdfVersion}, Actual: ${actualQpdfVersion}`);
+            }
+            
+            if (expectedGsVersion === 'latest'){
+              core.info(`Ghostscript version check skipped because 'latest' was specified.`);
+            } else if (!ghostscriptVersionMatch) {
+              core.setFailed(`Ghostscript version mismatch. Expected: ${expectedGsVersion}, Actual: ${actualGsVersion}`);
+            }

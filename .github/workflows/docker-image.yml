@@ -64,7 +64,9 @@ jobs:
         with:
           script: |
             let args = [];
-            if ('${{ matrix.combination.nodejs }}' !== 'latest') {
+            if ('${{ matrix.combination.nodejs }}' === 'latest') {
+              args.push(`--target node-latest`);
+            } else {
               args.push(`--build-arg NODE_VERSION=${{ matrix.combination.nodejs }}`);
             }
             if ('${{ matrix.combination.qpdf }}' !== 'latest') {
