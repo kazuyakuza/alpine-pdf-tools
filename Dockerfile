@@ -32,13 +32,17 @@ RUN if [ "$QPDF_VERSION" = "latest" ]; then \
     make -j$(nproc) && \
     make install
 
-# Node.js base image
+# Helper stage to determine Node.js image
+FROM alpine:latest AS helper
+ARG NODE_VERSION=latest
 RUN if [ "$NODE_VERSION" = "latest" ]; then \
-      NODE_IMAGE="node:alpine"; \
+      echo "NODE_IMAGE=node:alpine" > /tmp/node_image.env; \
     else \
-      NODE_IMAGE="node:${NODE_VERSION}-alpine"; \
+      echo "NODE_IMAGE=node:${NODE_VERSION}-alpine" > /tmp/node_image.env; \
     fi
-FROM --platform=linux/amd64 $NODE_IMAGE as node-base
+
+# Node.js base image
+FROM --platform=linux/amd64 $(cat /tmp/node_image.env | cut -d '=' -f 2) as node-base
 
 # Final stage
 FROM alpine:latest
