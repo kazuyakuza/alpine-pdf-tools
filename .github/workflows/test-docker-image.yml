@@ -64,9 +64,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            echo "GITHUB_ENV content:"
-            cat $GITHUB_ENV
-
             const fs = require('fs');
 
             const outputFile = $GITHUB_ENV;
