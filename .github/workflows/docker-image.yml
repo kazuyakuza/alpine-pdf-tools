@@ -76,12 +76,10 @@ jobs:
               args.push(`--build-arg GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
             }
             args = args.join(' ');
-            console.log({ args });
             core.setOutput('args', args);
-            console.log('Arguments set end');
 
       - name: Debug build arguments
-        run: echo "Build arguments ${{ steps.build_args.output.args }}"
+        run: echo "Build arguments ${{ steps.build_args.outputs.args }}"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
