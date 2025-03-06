@@ -5,8 +5,6 @@ ARG GHOSTSCRIPT_VERSION=latest
 # Builder stage for qpdf
 FROM alpine:latest AS builder
 
-ARG QPDF_VERSION=latest
-
 RUN apk add --no-cache \
     build-base \
     cmake \
@@ -32,17 +30,14 @@ RUN if [ "$QPDF_VERSION" = "latest" ]; then \
     make -j$(nproc) && \
     make install
 
-# Helper stage to determine Node.js image
-FROM alpine:latest AS helper
-ARG NODE_VERSION=latest
-RUN if [ "$NODE_VERSION" = "latest" ]; then \
-      echo "NODE_IMAGE=node:alpine" > /tmp/node_image.env; \
-    else \
-      echo "NODE_IMAGE=node:${NODE_VERSION}-alpine" > /tmp/node_image.env; \
+# Node.js base image
+ARG NODE_IMAGE=node:alpine
+
+RUN if [ "$NODE_VERSION" != "latest" ]; then \
+      NODE_IMAGE="node:${NODE_VERSION}-alpine"; \
     fi
 
-# Node.js base image
-FROM --platform=linux/amd64 $(cat /tmp/node_image.env | cut -d '=' -f 2) as node-base
+FROM --platform=linux/amd64 ${NODE_IMAGE} as node-base
 
 # Final stage
 FROM alpine:latest
@@ -53,7 +48,6 @@ COPY --from=builder /usr/local/bin/qpdf /usr/local/bin/qpdf
 COPY --from=builder /usr/local/lib/libqpdf* /usr/local/lib/
 COPY --from=node-base /usr/local/bin/node /usr/local/bin/
 COPY --from=node-base /usr/local/lib/node_modules /usr/local/lib/node_modules
-
 
 # Install Ghostscript
 RUN if [ "$GHOSTSCRIPT_VERSION" = "latest" ]; then \
