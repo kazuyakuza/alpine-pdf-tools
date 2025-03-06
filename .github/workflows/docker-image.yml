@@ -63,19 +63,18 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            let args = [];
+            let args = {};
             if ('${{ matrix.combination.nodejs }}' === 'latest') {
               core.setOutput('target', 'node-latest');
             } else {
-              args.push(`NODE_VERSION=${{ matrix.combination.nodejs }}`);
+              args.NODE_VERSION=${{ matrix.combination.nodejs }};
             }
             if ('${{ matrix.combination.qpdf }}' !== 'latest') {
-              args.push(`QPDF_VERSION=${{ matrix.combination.qpdf }}`);
+              args.QPDF_VERSION=${{ matrix.combination.qpdf }};
             }
             if ('${{ matrix.combination.ghostscript }}' !== 'latest') {
-              args.push(`GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }}`);
+              args.GHOSTSCRIPT_VERSION=${{ matrix.combination.ghostscript }};
             }
-            args = args.filter(arg => arg.trim());
             core.setOutput('args', JSON.stringify(args));
 
       - name: Debug build arguments
