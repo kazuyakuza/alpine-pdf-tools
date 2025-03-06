@@ -55,8 +55,8 @@ jobs:
       - name: Run Docker image and get versions
         id: run_image
         run: |
-          docker run alpine-pdf-tools:test | tee output.log
-          echo "stdout=$(cat output.log)" >> $GITHUB_OUTPUT
+          mkdir -p logs && docker run alpine-pdf-tools:test | tee logs/output.txt
+          echo "stdout=$(cat logs/output.txt)" >> $GITHUB_OUTPUT
 
       - name: Compare versions
         uses: actions/github-script@v6
