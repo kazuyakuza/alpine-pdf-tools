@@ -55,37 +55,39 @@ jobs:
       - name: Run Docker image and get versions
         id: run_image
         run: |
-          echo "::set-output name=stdout::$(docker run alpine-pdf-tools:test)"
+          docker run alpine-pdf-tools:test | tee output.txt
+          echo "stdout=$(cat output.txt)" >> $GITHUB_OUTPUT
 
       - name: Compare versions
         uses: actions/github-script@v6
         with:
           script: |
-            const output = '${{ steps.run_image.outputs.stdout }}';
+            const fs = require('fs');
+            const output = fs.readFileSync(process.env.GITHUB_OUTPUT, 'utf8').match(/stdout=(.*)/)[1];
             const expectedNodeVersion = '${{ matrix.combination.nodejs }}' === 'latest' ? 'latest' : '${{ matrix.combination.nodejs }}';
             const expectedQpdfVersion = '${{ matrix.combination.qpdf }}' === 'latest' ? 'latest' : '${{ matrix.combination.qpdf }}';
             const expectedGsVersion = '${{ matrix.combination.ghostscript }}' === 'latest' ? 'latest' : '${{ matrix.combination.ghostscript }}';
 
-            const nodeVersionMatch = output.match(/v(\d+\.\d+\.\d+|\d+\.\d+|\d+)/);
-            const qpdfVersionMatch = output.match(/qpdf version (\d+\.\d+\.\d+)/);
-            const gsVersionMatch = output.match(/(\d+\.\d+\.\d+|\d+\.\d+|\d+)/);
+            const nodeVersionMatch = output.match(/----node-version\nv([\d.]+)/);
+            const qpdfVersionMatch = output.match(/----qpdf-version\nqpdf version ([\d.]+)/);
+            const gsVersionMatch = output.match(/----ghostscript-version\n([\d.]+)/);
 
             const actualNodeVersion = nodeVersionMatch ? nodeVersionMatch[1] : null;
             const actualQpdfVersion = qpdfVersionMatch ? qpdfVersionMatch[1] : null;
             const actualGsVersion = gsVersionMatch ? gsVersionMatch[1] : null;
 
-            if (expectedNodeVersion === 'latest') {
-               core.info(`Node.js version check skipped because 'latest' was specified.`);
-            } else {
+            if (expectedNodeVersion !== 'latest' && actualNodeVersion !== expectedNodeVersion) {
               core.setFailed(`Node.js version mismatch. Expected: ${expectedNodeVersion}, Actual: ${actualNodeVersion}`);
+            } else if (expectedNodeVersion === 'latest') {
+                core.info(`Node.js version check skipped because 'latest' was specified.`);
             }
-            if (expectedQpdfVersion === 'latest') {
-              core.info(`qpdf version check skipped because 'latest' was specified.`);
-            } else {
+            if (expectedQpdfVersion !== 'latest' && actualQpdfVersion !== expectedQpdfVersion) {
               core.setFailed(`qpdf version mismatch. Expected: ${expectedQpdfVersion}, Actual: ${actualQpdfVersion}`);
+            } else if (expectedQpdfVersion === 'latest') {
+                core.info(`qpdf version check skipped because 'latest' was specified.`);
             }
-            if (expectedGsVersion === 'latest' ) {
-              core.info(`Ghostscript version check skipped because 'latest' was specified.`);
-            } else {
+            if (expectedGsVersion !== 'latest' && actualGsVersion !== expectedGsVersion) {
               core.setFailed(`Ghostscript version mismatch. Expected: ${expectedGsVersion}, Actual: ${actualGsVersion}`);
+            } else if (expectedGsVersion === 'latest'){
+                core.info(`Ghostscript version check skipped because 'latest' was specified.`);
             }
