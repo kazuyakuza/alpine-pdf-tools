@@ -33,7 +33,12 @@ RUN if [ "$QPDF_VERSION" = "latest" ]; then \
     make install
 
 # Node.js base image
-FROM --platform=linux/amd64 node:${NODE_VERSION}-alpine as node-base
+RUN if [ "$NODE_VERSION" = "latest" ]; then \
+      NODE_IMAGE="node:alpine"; \
+    else \
+      NODE_IMAGE="node:${NODE_VERSION}-alpine"; \
+    fi
+FROM --platform=linux/amd64 $NODE_IMAGE as node-base
 
 # Final stage
 FROM alpine:latest
