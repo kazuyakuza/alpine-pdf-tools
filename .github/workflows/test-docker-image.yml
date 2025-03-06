@@ -73,24 +73,22 @@ jobs:
             const expectedQpdfVersion = '${{ matrix.combination.qpdf }}' === 'latest' ? 'latest' : '${{ matrix.combination.qpdf }}';
             const expectedGsVersion = '${{ matrix.combination.ghostscript }}' === 'latest' ? 'latest' : '${{ matrix.combination.ghostscript }}';
 
-            const nodeVersionMatch = output.match(/----node-version\nv([\d.]+)/);
-            const qpdfVersionMatch = output.match(/----qpdf-version\nqpdf version ([\d.]+)/);
-            const gsVersionMatch = output.match(/----ghostscript-version\n([\d.]+)/);
+            const parseNodeVersion = output.match(/----node-version\nv([\d.]+)/);
+            const parseQpdfVersion = output.match(/----qpdf-version\nqpdf version ([\d.]+)/);
+            const parseGsVersion = output.match(/----ghostscript-version\n([\d.]+)/);
 
-            const actualNodeVersion = nodeVersionMatch ? nodeVersionMatch[1] : null;
-            const actualQpdfVersion = qpdfVersionMatch ? qpdfVersionMatch[1] : null;
-            const actualGsVersion = gsVersionMatch ? gsVersionMatch[1] : null;
+            const actualNodeVersion = parseNodeVersion ? parseNodeVersion[1] : null;
+            const actualQpdfVersion = parseQpdfVersion ? parseQpdfVersion[1] : null;
+            const actualGsVersion = parseGsVersion ? parseGsVersion[1] : null;
             
             const nodeVersionMatch = (
               actualNodeVersion.match(expectedNodeVersion.replace('.','[.]'))
               || expectedNodeVersion.match(actualNodeVersion.replace('.','[.]'))
             );
-            
             const qpdfVersionMatch = (
               actualQpdfVersion.match(expectedQpdfVersion.replace('.','[.]'))
               || expectedQpdfVersion.match(actualQpdfVersion.replace('.','[.]'))
             );
-            
             const ghostscriptVersionMatch = (
               actualGsVersion.match(expectedGsVersion.replace('.','[.]'))
               || expectedGsVersion.match(actualGsVersion.replace('.','[.]'))
