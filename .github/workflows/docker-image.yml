@@ -63,7 +63,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const core = require('@actions/core');
             let args = [];
             if ('${{ matrix.combination.nodejs }}' === 'latest') {
               args.push(`--target node-latest`);
