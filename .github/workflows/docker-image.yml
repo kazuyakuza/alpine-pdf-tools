@@ -77,6 +77,9 @@ jobs:
             }
             core.setOutput('args', args.join(' '));
 
+      - name: Debug build arguments
+        run: echo "Build arguments: ${{ steps.build_args.outputs.args }}"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
