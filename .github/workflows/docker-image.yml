@@ -63,7 +63,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            let args = { };
+            let args = [];
             if ('${{ matrix.combination.nodejs }}' === 'latest') {
               core.setOutput('target', 'node-latest');
             } else {
